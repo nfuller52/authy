@@ -1,0 +1,25 @@
+plugins:
+  - rubocop-rspec
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "vendor/**/*"
+  TargetRubyVersion: 3.4
+
+Style/Documentation:
+  Enabled: false
+
+Naming/InclusiveLanguage:
+  Enabled: true
+  CheckStrings: true
+
+RSpec/NestedGroups:
+  Max: 7
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+Metrics/MethodLength:
+  Max: 15

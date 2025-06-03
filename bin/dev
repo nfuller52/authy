@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+bundle exec rerun --no-notify --quiet -- falcon serve
