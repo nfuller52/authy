@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+bundle exec rubocop
+bundle exec reek
+bundle exec fasterer

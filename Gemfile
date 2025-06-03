@@ -17,6 +17,10 @@ group :local do
 end
 
 group :local, :test do
+  gem 'brakeman', '~> 7.0', require: false
+  gem 'bundler-audit', '~> 0.9', require: false
+  gem 'fasterer', '~> 0.11', require: false
+  gem 'reek', '~> 6.5', require: false
   gem 'rubocop', '~> 1.75', require: false
   gem 'rubocop-performance', '~> 1.25', require: false
   gem 'rubocop-rspec', '~> 3.6', require: false

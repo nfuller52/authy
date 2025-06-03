@@ -34,6 +34,16 @@ cp .env.local.sample .env.local
 direnv allow
 ```
 
+## Dev command helpers
+
+```bash
+bundle exec rubocop
+bundle exec brakeman
+bundle exec bundler-audit check --update
+bundle exec reek
+bundle exec fasterer
+```
+
 ## Patterns
 
 Request lifecycle...
