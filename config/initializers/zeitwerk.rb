@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "zeitwerk"
+require 'zeitwerk'
 
 # feels hacky?
 module Formatters; end
@@ -11,12 +11,12 @@ module Support; end
 loader = Zeitwerk::Loader.new
 
 paths = {
-  "data" => nil,
-  "formatters" => Formatters,
-  "middleware" => Middleware,
-  "modules" => nil,
-  "renderers" => Renderers,
-  "support" => Support,
+  'data' => nil,
+  'formatters' => Formatters,
+  'middleware' => Middleware,
+  'modules' => nil,
+  'renderers' => Renderers,
+  'support' => Support
 }
 
 paths.each do |dir, namespace|
@@ -29,5 +29,5 @@ paths.each do |dir, namespace|
   end
 end
 
-loader.enable_reloading if ENV["ENVIRONMENT"] == "local"
+loader.enable_reloading if ENV['ENVIRONMENT'] == 'local'
 loader.setup

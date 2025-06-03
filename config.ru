@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-ENV["ENVIRONMENT"] ||= "local"
-env = ENV["ENVIRONMENT"]
+ENV['ENVIRONMENT'] ||= 'local'
+ENV.fetch('ENVIRONMENT', nil)
 
 require_relative 'config/initializers/zeitwerk'
 require_relative 'application'

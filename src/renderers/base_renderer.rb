@@ -11,7 +11,8 @@ module Renderers
     def traverse(data)
       case data
       when Hash
-        data.each_with_object({}) do |(k, v), acc|
+        data.each_with_object({}) do |(key, value), acc|
+          transform(key: key, value: value, acc: acc)
         end
       when Array
         data.map { |node| traverse(node) }
@@ -20,7 +21,7 @@ module Renderers
       end
     end
 
-    def transform(acc, key, value)
+    def transform(key:, value:, acc:)
       TRANSFORMERS.map { |_transformer| call(acc, key, value) }
     end
   end

@@ -11,15 +11,25 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Style/MethodDefParentheses:
+  EnforcedStyle: require_parentheses
+
+Style/OptionHash:
+  Enabled: true
+
 Naming/InclusiveLanguage:
   Enabled: true
   CheckStrings: true
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/ParameterLists:
+  Max: 4
+  CountKeywordArgs: true
 
 RSpec/NestedGroups:
   Max: 7
 
 RSpec/MultipleExpectations:
   Max: 5
-
-Metrics/MethodLength:
-  Max: 15
