@@ -2,6 +2,9 @@
 
 source 'https://rubygems.org'
 
+gem 'bake', '~> 0.23'
+gem 'db', '~> 0.12'
+gem 'db-postgres', '~> 0.8'
 gem 'falcon', '~> 0.51'
 gem 'sinatra', '~> 4.1'
 gem 'zeitwerk', '~> 2.7'
@@ -19,6 +22,7 @@ end
 group :local, :test do
   gem 'brakeman', '~> 7.0', require: false
   gem 'bundler-audit', '~> 0.9', require: false
+  gem 'debug', '~> 1.10', require: false
   gem 'fasterer', '~> 0.11', require: false
   gem 'reek', '~> 6.5', require: false
   gem 'rubocop', '~> 1.75', require: false

@@ -1,0 +1,159 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# I know this is insane. It's just a dirty implementation to create and remove tables.
+
+require 'optparse'
+
+MIGRATIONS_DIR = File.expand_path('../config/database/migrations', __dir__)
+MIGRATIONS_TABLE_NAME = 'authy_migrations'
+
+require 'db/client'
+require 'db/postgres'
+
+options = {}
+OptionParser.new do |parser|
+  parser.on('--new NAME', 'Create a new migration') do |v|
+    options[:new] = v
+  end
+
+  parser.on('--revert', 'Drop the last ran migration') do |v|
+    # TODO: accept a string of the migration to drop to
+    options[:revert] = true
+  end
+end.parse!
+
+# Util funcs
+def timestamp
+  Time.now.utc.strftime('%Y%m%d%H%M')
+end
+
+def modularize_name(name)
+  name.downcase.split("_").map(&:capitalize).join
+end
+
+def create_migration_file(name)
+  the_time = timestamp
+  file_name = "#{the_time}_#{name}.rb"
+  path = File.join(MIGRATIONS_DIR, file_name)
+  module_name = "Migration#{the_time}#{modularize_name(name)}"
+
+  contents = <<~RUBY
+    # frozen_string_literal: true
+
+    module #{module_name}
+      TABLE_NAME = 'users'
+
+      def self.up(session)
+        session.call(<<~SQL)
+          CREATE TABLE IF NOT EXISTS \#\{TABLE_NAME\} (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+            updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+          );
+        SQL
+
+        session.call(<<~SQL)
+          CREATE TRIGGER set_users_updated_at
+          BEFORE UPDATE ON \#\{TABLE_NAME\}
+          FOR EACH ROW
+          EXECUTE FUNCTION set_updated_at()
+        SQL
+      end
+
+      def self.down(session)
+        session.call("DROP TRIGGER IF EXISTS set_users_updated_at ON \#\{TABLE_NAME\};")
+        session.call("DROP TABLE IF EXISTS \#\{TABLE_NAME\};")
+      end
+    end
+  RUBY
+
+  File.write(path, contents)
+end
+
+def run_migrations(client)
+  Sync do
+    session = client.session
+
+    # Create the migrations table
+    session.call(<<~SQL)
+      CREATE TABLE IF NOT EXISTS #{MIGRATIONS_TABLE_NAME} (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        applied_at TIMESTAMP NOT NULL DEFAULT now()
+      );
+
+      CREATE UNIQUE INDEX authy_migrations_uniq_idx ON #{MIGRATIONS_TABLE_NAME}(name, applied_at);
+    SQL
+
+    # Load migrations which have been ran
+    completed_migrations = session.call("SELECT name FROM #{MIGRATIONS_TABLE_NAME};").to_a
+
+    # Run migration files
+    files = Dir[File.join(MIGRATIONS_DIR, "*.rb")].sort
+
+    files.each do |file|
+      file_name = File.basename(file, ".rb")
+
+      next if completed_migrations.include?([file_name])
+
+      require file
+
+      puts("-> UP Migration #{file_name}")
+      module_name = "Migration#{modularize_name(file_name)}"
+      migration_module = Object.const_get(module_name)
+
+      migration_module.up(session)
+
+      session.call("INSERT INTO #{MIGRATIONS_TABLE_NAME} (name) VALUES ('#{file_name}');")
+    end
+  ensure
+    session&.close
+  end
+end
+
+def revert_migration(client)
+  Sync do
+    session = client.session
+
+    result = session.call("SELECT name FROM #{MIGRATIONS_TABLE_NAME} ORDER BY id DESC LIMIT 1;")
+    last_migration = result.to_a.first&.first
+
+    next if last_migration.nil?
+
+    # load the file
+    file = File.open("#{MIGRATIONS_DIR}/#{last_migration}.rb")
+    require file
+
+    # load the module
+    puts("-> DOWN Migration #{File.basename(file, '.rb')}")
+    module_name = "Migration#{modularize_name(last_migration)}"
+    migration_module = Object.const_get(module_name)
+
+    # run the down method
+    migration_module.down(session)
+
+    # remove the record from the authy_migrations table
+    result = session.call("DELETE FROM #{MIGRATIONS_TABLE_NAME} WHERE name='#{last_migration}';")
+  ensure
+    session&.close
+  end
+end
+
+client = DB::Client.new(
+  DB::Postgres::Adapter.new(
+    database: 'authy_development',
+    username: 'postgres',
+    password: 'postgres',
+    host: 'localhost',
+    port: 6001
+  )
+)
+
+if options[:new]
+  create_migration_file(options[:new])
+elsif options[:revert]
+  revert_migration(client)
+else
+  run_migrations(client)
+end

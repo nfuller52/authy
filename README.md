@@ -7,8 +7,24 @@ Sinatra-based auth API, for fun. Uses Falcon as the app server. Dev environment 
 - Ruby 3.x
 - Bundler
 - PostgreSQL
-- Redis (eventually)
+- Redis (maybe)
 - Falcon (included in Gemfile)
+
+## Endpoints
+
+| HTTP Method & Path                      | Description                     | Module        |
+| --------------------------------------- | ------------------------------- | ------------- |
+| `POST /oauth/token`                     | access tokens (login)           | oauth         |
+| `POST /oauth/revoke`                    | kills tokens (logout)           | oauth         |
+| `GET /userinfo`                         | user info (OIDC)                | oauth         |
+| `GET /.well-known/jwks.json`            | JWKS publ keys jto validate JWT | well_known    |
+| `GET /.well-known/openid-configuration` | OIDC manifest (maybe..)         | well_known    |
+| `POST /registrations`                   | create a user                   | registrations |
+| `POST /passwords`                       | trigger password reset          | passwords     |
+| `PUT /passwords`                        | udpate password (verify token)  | passwords     |
+| `POST /confirmations`                   | verifies a token (email, etc.)  | confirmations |
+| `PUT /users/:id`                        | update user                     | users         |
+| `DELETE /users/:id`                     | deactivate a user               | users         |
 
 ## Getting Started
 

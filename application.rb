@@ -8,8 +8,7 @@ require 'sinatra/base'
 
 module Application
   class Authy < Sinatra::Base
-    get '/' do
-      'Hello World!'
-    end
+    use Registrations::Router
+    use WellKnown::Router
   end
 end
