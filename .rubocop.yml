@@ -17,6 +17,9 @@ Style/MethodDefParentheses:
 Style/OptionHash:
   Enabled: true
 
+Layout/LineLength:
+  Max: 88
+
 Naming/InclusiveLanguage:
   Enabled: true
   CheckStrings: true

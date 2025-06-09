@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 ENV['ENVIRONMENT'] ||= 'local'
-ENV.fetch('ENVIRONMENT', nil)
 
 require_relative 'config/initializers/zeitwerk'
-require_relative 'application'
+require_relative 'config/environment'
+require_relative 'config/router'
 
-run Application::Authy
+# Autoloaded by zeitwerk
+run Authy::Router

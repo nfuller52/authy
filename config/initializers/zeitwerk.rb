@@ -29,5 +29,10 @@ paths.each do |dir, namespace|
   end
 end
 
+loader.inflector.inflect(
+  'http' => 'HTTP',
+  'oauth' => 'OAuth'
+)
+
 loader.enable_reloading if ENV['ENVIRONMENT'] == 'local'
 loader.setup

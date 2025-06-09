@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Migration0CreateSetUpdatedAtFunction
+module Migration202506071310CreateSetUpdatedAtFunction
   def self.up(session)
     session.call(<<~SQL)
       CREATE OR REPLACE FUNCTION set_updated_at()

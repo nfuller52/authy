@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module WellKnown
-  class Router < Support::Http::Router
+  class Router < Support::HTTP::Router
     get '/.well-known/jwks.json' do
       puts(Queries::VersionQuery.call)
 

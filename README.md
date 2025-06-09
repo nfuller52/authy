@@ -26,6 +26,22 @@ Sinatra-based auth API, for fun. Uses Falcon as the app server. Dev environment 
 | `PUT /users/:id`                        | update user                     | users         |
 | `DELETE /users/:id`                     | deactivate a user               | users         |
 
+## Data Flow (First Pass)
+
+1. User enters email/password in frontend (client)
+2. Client sends POST /token with:
+   - grant_type=password
+   - client_id + client_secret
+   - username + password
+3. Authy server verifies:
+   - client (via `oauth_clients`)
+   - user (via `users`)
+4. If valid, server returns:
+   - access_token (JWT w/ jti)
+   - refresh_token (UUID? Maybe, or JWT)
+5. Client uses access_token in Authorization header
+6. API server verifies JWT, checks revocation
+
 ## Getting Started
 
 Install deps:
